@@ -5,7 +5,9 @@ from sqlalchemy.orm import Session
 from dotenv import load_dotenv, find_dotenv
 import os
 
-from app.db_models.base import *
+from app.db_models.crud.base import *
+from app.db_models.crud.kanbanboard import KanbanBoard
+from app.db_models.crud.kanbanstatus import KanbanStatus
 from app.db_models.session import engine, SessionLocal
 
 def create_default_statuses(db: Session) -> None:
@@ -25,12 +27,12 @@ def create_default_board(db: Session) -> None:
     db.refresh(board)
 
 def create_kanban_defaults(db: Session, create_defaults: Optional[str] = True) -> None:
-    if create_defaults.lower() == 'true':
+    if create_defaults and create_defaults.lower() == 'true':
         logger.info("Creating default Kanban Board and Statuses")
         logger.info("To set off, add env variable CREATE_DEFAULTS=False")
         create_default_board(db)
         create_default_statuses(db)
-    elif create_defaults.lower() == 'false': logger.info("Create defaults is set to False, not creating default Kanban Board and Statuses")
+    elif create_defaults and create_defaults.lower() == 'false': logger.info("Create defaults is set to False, not creating default Kanban Board and Statuses")
     else: logger.info("No CREATE_DEFAULTS env variable set, not creating default Kanban Board and Statuses")
 
 
