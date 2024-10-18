@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime
+from app.api_models.history import History
 
 
 class ProjectCreate(BaseModel):
@@ -15,3 +16,6 @@ class ProjectResponse(ProjectCreate):
     class Config:
         from_attributes = True
 
+class ProjectWithHistory(BaseModel):
+    project: ProjectCreate
+    history: List[History]

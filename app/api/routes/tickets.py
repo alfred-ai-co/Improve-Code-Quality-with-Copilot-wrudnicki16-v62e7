@@ -5,6 +5,8 @@ from fastapi import Depends
 from app.db_models.crud import TicketCRUD
 from app.api_models.tickets import TicketCreate, TicketResponse
 from app.api.dependencies.sqldb import get_db
+from app.api.routes.history import get_history_by_entity_id
+from app.api_models.tickets import TicketWithHistory
 
 
 router = APIRouter()
@@ -29,6 +31,15 @@ def get_ticket(id: int, db: Session = Depends(get_db)):
     if not ticket:
         raise HTTPException(status_code=404, detail=f"Ticket with id {id} not found")
     return ticket
+
+@router.get("/{ticket_id}", response_model=TicketWithHistory)
+def get_ticket_with_history(ticket_id: int, db: Session = Depends(get_db)):
+    ticket_crud = TicketCRUD(db)
+    ticket = ticket_crud.get(ticket_id)
+    if not ticket:
+        raise HTTPException(status_code=404, detail=f"Ticket with id {ticket_id} not found")
+    history = get_history_by_entity_id('ticket', ticket_id)
+    return {"ticket": ticket, "history": history}
 
 
 @router.put("/{id}", status_code=200, response_model=TicketResponse)

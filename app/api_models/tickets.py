@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime
+from app.api_models.history import History
 
 
 class TicketCreate(BaseModel):
@@ -17,3 +18,7 @@ class TicketResponse(TicketCreate):
     
     class Config:
         from_attributes = True
+
+class TicketWithHistory(BaseModel):
+    ticket: TicketCreate
+    history: List[History]

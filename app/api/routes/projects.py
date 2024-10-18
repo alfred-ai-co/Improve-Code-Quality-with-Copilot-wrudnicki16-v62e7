@@ -6,6 +6,8 @@ from fastapi import Depends
 from app.db_models.crud import ProjectCRUD
 from app.api_models.projects import ProjectCreate, ProjectResponse
 from app.api.dependencies.sqldb import get_db
+from app.api.routes.history import get_history_by_entity_id
+from app.api_models.projects import ProjectWithHistory
 
 
 router = APIRouter()
@@ -31,6 +33,14 @@ def get_project(id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail=f"Project with id {id} not found")
     return project
 
+@router.get("/{project_id}", response_model=ProjectWithHistory)
+def get_project_with_history(project_id: int, db: Session = Depends(get_db)):
+    project_crud = ProjectCRUD(db)
+    project = project_crud.get(project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail=f"Ticket with id {project_id} not found")
+    history = get_history_by_entity_id('project', project_id)
+    return {"project": project, "history": history}
 
 @router.put("/{id}", status_code=200, response_model=ProjectResponse)
 def update_project(id: int, project: ProjectCreate, db: Session = Depends(get_db)):
