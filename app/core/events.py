@@ -7,6 +7,7 @@ import os
 
 from app.db_models.base import *
 from app.db_models.session import engine, SessionLocal
+from app.db_models import hooks
 
 def create_default_statuses(db: Session) -> None:
     statuses = [
