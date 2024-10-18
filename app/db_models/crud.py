@@ -136,3 +136,25 @@ class KanbanStatusCRUD(BaseCRUD):
     
     def delete(self, id: int):
         return super().delete(id)
+    
+class HistoryCRUD(BaseCRUD):
+    def __init__(self, db: Session):
+        super().__init__(db, History)
+    
+    def create(self, entity_type: str, entity_id: int, change_type: str, user_id: int, details: str):
+        return super().create(entity_type=entity_type, entity_id=entity_id, change_type=change_type, user_id=user_id, details=details)
+    
+    def get(self, id: int):
+        return super().get(id)
+    
+    def get_all(self):
+        return super().get_all()
+    
+    def get_by_entity_id(self, entity_id: int):
+        return self.db.query(self.model).filter(self.model.entity_id == entity_id).all()
+    
+    def update(self, id: int, entity_type: str, entity_id: int, change_type: str, user_id: int, details: str):
+        return super().update(id, entity_type=entity_type, entity_id=entity_id, change_type=change_type, user_id=user_id, details=details)
+    
+    def delete(self, id: int):
+        return super().delete(id)
