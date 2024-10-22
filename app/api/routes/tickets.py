@@ -24,13 +24,13 @@ def get_all_tickets(db: Session = Depends(get_db)):
     return ticket_crud.get_all()
 
 
-@router.get("/{id}", status_code=200, response_model=TicketResponse)
-def get_ticket(id: int, db: Session = Depends(get_db)):
-    ticket_crud = TicketCRUD(db)
-    ticket = ticket_crud.get(id)
-    if not ticket:
-        raise HTTPException(status_code=404, detail=f"Ticket with id {id} not found")
-    return ticket
+# @router.get("/{id}", status_code=200, response_model=TicketResponse)
+# def get_ticket(id: int, db: Session = Depends(get_db)):
+#     ticket_crud = TicketCRUD(db)
+#     ticket = ticket_crud.get(id)
+#     if not ticket:
+#         raise HTTPException(status_code=404, detail=f"Ticket with id {id} not found")
+#     return ticket
 
 @router.get("/{ticket_id}", response_model=TicketWithHistory)
 def get_ticket_with_history(ticket_id: int, db: Session = Depends(get_db)):
@@ -38,8 +38,9 @@ def get_ticket_with_history(ticket_id: int, db: Session = Depends(get_db)):
     ticket = ticket_crud.get(ticket_id)
     if not ticket:
         raise HTTPException(status_code=404, detail=f"Ticket with id {ticket_id} not found")
-    history = get_history_by_entity_id('ticket', ticket_id)
-    return {"ticket": ticket, "history": history}
+    history = get_history_by_entity_id('ticket', ticket_id, db=db)
+    
+    return TicketWithHistory(ticket=ticket, history=history)
 
 
 @router.put("/{id}", status_code=200, response_model=TicketResponse)

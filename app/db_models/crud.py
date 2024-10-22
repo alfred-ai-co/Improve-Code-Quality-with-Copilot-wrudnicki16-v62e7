@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
+from fastapi import BackgroundTasks
 from abc import ABC, abstractmethod
 from app.db_models.base import *
-
+from typing import List
 
 class CRUDInterface(ABC):
     @abstractmethod
@@ -62,8 +63,8 @@ class ProjectCRUD(BaseCRUD):
     def __init__(self, db: Session):
         super().__init__(db, Project)
     
-    def create(self, name: str, description: str):
-        return super().create(name=name, description=description)
+    def create(self, name: str, description: str, kanban_board_id: int):
+        return super().create(name=name, description=description, kanban_board_id=kanban_board_id)
     
     def get(self, id: int):
         return super().get(id)
@@ -71,8 +72,8 @@ class ProjectCRUD(BaseCRUD):
     def get_all(self):
         return super().get_all()
     
-    def update(self, id: int, name: str, description: str):
-        return super().update(id, name=name, description=description)
+    def update(self, id: int, name: str, description: str, kanban_board_id: int):
+        return super().update(id, name=name, description=description, kanban_board_id=kanban_board_id)
     
     def delete(self, id: int):
         return super().delete(id)
@@ -82,8 +83,8 @@ class TicketCRUD(BaseCRUD):
     def __init__(self, db: Session):
         super().__init__(db, Ticket)
     
-    def create(self, project_id: int, title: str, description: str, status: str, priority: str):
-        return super().create(project_id=project_id, title=title, description=description, status=status, priority=priority)
+    def create(self, project_id: int, title: str, description: str, status: str, priority: str, kanban_status_id: int):
+        return super().create(project_id=project_id, title=title, description=description, status=status, priority=priority, kanban_status_id=kanban_status_id)
     
     def get(self, id: int):
         return super().get(id)
@@ -91,8 +92,8 @@ class TicketCRUD(BaseCRUD):
     def get_all(self):
         return super().get_all()
     
-    def update(self, id: int, project_id: int, title: str, description: str, status: str, priority: str):
-        return super().update(id, project_id=project_id, title=title, description=description, status=status, priority=priority)
+    def update(self, id: int, project_id: int, title: str, description: str, status: str, priority: str, kanban_status_id: int):
+        return super().update(id, project_id=project_id, title=title, description=description, status=status, priority=priority, kanban_status_id=kanban_status_id)
     
     def delete(self, id: int):
         return super().delete(id)
@@ -150,11 +151,14 @@ class HistoryCRUD(BaseCRUD):
     def get_all(self):
         return super().get_all()
     
-    def get_by_entity_id(self, entity_id: int):
-        return self.db.query(self.model).filter(self.model.entity_id == entity_id).all()
+    def get_by_entity_id(self, entity_type: str, entity_id: int, offset: int = 0, limit: int = 100):
+        return self.db.query(self.model).filter(self.model.entity_id == entity_id, self.model.entity_type == entity_type).offset(offset).limit(limit).all()
     
     def update(self, id: int, entity_type: str, entity_id: int, change_type: str, user_id: int, details: str):
         return super().update(id, entity_type=entity_type, entity_id=entity_id, change_type=change_type, user_id=user_id, details=details)
     
     def delete(self, id: int):
         return super().delete(id)
+    
+    def retrieve_history_records(db: Session, entity_id: int, skip: int, limit: int = 100) -> List[History]:
+        return db.query(History).filter(History.entity_id == entity_id).offset(skip).limit(limit).all()

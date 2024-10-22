@@ -1,12 +1,13 @@
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime
-from app.api_models.history import History
+from app.api_models.history import HistoryCreate
 
 
 class ProjectCreate(BaseModel):
     name: str
     description: Optional[str] = None
+    kanban_board_id: int
 
 
 class ProjectResponse(ProjectCreate):
@@ -18,4 +19,4 @@ class ProjectResponse(ProjectCreate):
 
 class ProjectWithHistory(BaseModel):
     project: ProjectCreate
-    history: List[History]
+    history: List[HistoryCreate]

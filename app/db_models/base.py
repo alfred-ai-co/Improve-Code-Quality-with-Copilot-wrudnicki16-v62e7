@@ -61,7 +61,7 @@ class KanbanStatus(Base):
     created_at = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc))
     updated_at = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc), onupdate=lambda: datetime.datetime.now(datetime.timezone.utc))
     
-    kanban_board = relationship('KanbanBoard', back_populates='kanban_status')
+    kanban_board = relationship('KanbanBoard', back_populates='statuses')
     tickets = relationship('Ticket', back_populates='kanban_status')
 
 class History(Base):

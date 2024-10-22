@@ -23,8 +23,8 @@ class HistoryCreate(BaseModel):
     details: Optional[str] = None
 
     @field_validator('details')
-    def details_not_empty(cls, v, values):
-        if values['change_type'] == ChangeType.COMMENT_CHANGE and not v:
+    def details_not_empty(cls, v, info):
+        if info.data['change_type'] == ChangeType.COMMENT_CHANGE and not v:
             raise ValueError('details must be provided for comments')
         return v
 
@@ -36,14 +36,14 @@ class HistoryUpdate(BaseModel):
     details: Optional[str] = None
 
     @field_validator('details')
-    def details_not_empty(cls, v, values):
-        if values['change_type'] == ChangeType.COMMENT_CHANGE and not v:
+    def details_not_empty(cls, v, info):
+        if info.data['change_type'] == ChangeType.COMMENT_CHANGE and not v:
             raise ValueError('details must be provided for comments')
         return v
 
 class HistoryResponse(HistoryCreate):
     id: int
-    created_at: datetime
+    timestamp: datetime
     
     class Config:
         from_attributes = True

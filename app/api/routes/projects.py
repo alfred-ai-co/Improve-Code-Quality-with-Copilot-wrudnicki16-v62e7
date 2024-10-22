@@ -34,13 +34,13 @@ def get_project(id: int, db: Session = Depends(get_db)):
     return project
 
 @router.get("/{project_id}", response_model=ProjectWithHistory)
-def get_project_with_history(project_id: int, db: Session = Depends(get_db)):
+async def get_project_with_history(project_id: int, db: Session = Depends(get_db)):
     project_crud = ProjectCRUD(db)
     project = project_crud.get(project_id)
     if not project:
         raise HTTPException(status_code=404, detail=f"Ticket with id {project_id} not found")
-    history = get_history_by_entity_id('project', project_id)
-    return {"project": project, "history": history}
+    history = await get_history_by_entity_id('project', project_id, db=db)
+    return ProjectWithHistory(project=project, history=history)
 
 @router.put("/{id}", status_code=200, response_model=ProjectResponse)
 def update_project(id: int, project: ProjectCreate, db: Session = Depends(get_db)):
