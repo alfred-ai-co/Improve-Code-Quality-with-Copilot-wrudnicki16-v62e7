@@ -78,3 +78,32 @@ def test_delete_history(test_db):
     response = client.get(f"/api/history/4?entity_type=project&offset=0&limit=20")
     assert response.status_code == 200
     assert len(response.json()) == 0
+
+# Additional tests for invalid or missing data
+def test_create_history_missing_entity_id(test_db):
+    response = client.post("/api/history/", json={"entity_type": "project", "change_type": "create", "user_id": 1, "details": "Project created"})
+    assert response.status_code == 422  # Unprocessable Entity
+
+def test_create_history_invalid_entity_type(test_db):
+    response = client.post("/api/history/", json={"entity_type": "invalid_type", "entity_id": 1, "change_type": "create", "user_id": 1, "details": "Invalid entity type"})
+    assert response.status_code == 422  # Unprocessable Entity
+
+def test_update_history_invalid_change_type(test_db):
+    response = client.post("/api/history", json={"entity_type": "project", "entity_id": 5, "change_type": "create", "user_id": 1, "details": "Project created"})
+    history_id = response.json()["id"]
+
+    update_data = {"entity_type": "project", "entity_id": 5, "change_type": "invalid_change", "user_id": 1}
+    response = client.put(f"/api/history/{history_id}", json=update_data)
+    assert response.status_code == 422  # Unprocessable Entity
+
+def test_update_history_missing_change_type(test_db):
+    response = client.post("/api/history", json={"entity_type": "project", "entity_id": 6, "change_type": "create", "user_id": 1, "details": "Project created"})
+    history_id = response.json()["id"]
+
+    update_data = {"entity_type": "project", "entity_id": 6, "user_id": 1, "details": "Missing change_type"}
+    response = client.put(f"/api/history/{history_id}", json=update_data)
+    assert response.status_code == 422  # Unprocessable Entity
+
+def test_delete_history_nonexistent_id(test_db):
+    response = client.delete("/api/history/9999")
+    assert response.status_code == 404  # Not Found
