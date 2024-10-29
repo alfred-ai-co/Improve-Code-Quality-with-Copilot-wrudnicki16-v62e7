@@ -5,6 +5,7 @@ from app.api.routes import projects
 from app.api.routes import tickets
 from app.api.routes import kanbanboard
 from app.api.routes import kanbanstatus
+from app.api.routes import history
 
 
 router = APIRouter()
@@ -14,3 +15,4 @@ router.include_router(projects.router, prefix="/projects", tags=["projects"])
 router.include_router(tickets.router, prefix="/tickets", tags=["tickets"])
 router.include_router(kanbanboard.router, prefix="/kanbanboard", tags=["kanbanboard"])
 router.include_router(kanbanstatus.router, prefix="/kanbanstatus", tags=["kanbanstatus"])
+router.include_router(history.router, prefix="/history", tags=["history"])
