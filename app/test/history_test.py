@@ -107,3 +107,30 @@ def test_update_history_missing_change_type(test_db):
 def test_delete_history_nonexistent_id(test_db):
     response = client.delete("/api/history/9999")
     assert response.status_code == 404  # Not Found
+
+# Integration tests for history interactions with projects and tickets
+def test_ticket_status_update_creates_history(test_db):
+    # Create a ticket
+    response = client.post("/api/tickets", json={"title": "Test Ticket", "status": "open", "project_id": 1, "description": "Test description", "priority": "low", "kanban_status_id": 1})
+    ticket_id = response.json()["id"]
+
+    # Update ticket status
+    update_data = {"title": "Test Ticket", "status": "closed", "project_id": 1, "description": "Test description", "priority": "low", "kanban_status_id": 1}
+    response = client.put(f"/api/tickets/{ticket_id}", json=update_data)
+    assert response.status_code == 200
+
+    # Check history record
+    response = client.get(f"/api/history/{ticket_id}?entity_type=ticket&offset=0&limit=20")
+    assert response.status_code == 200
+    assert len(response.json()) > 0
+    assert response.json()[0]["change_type"] == "update"
+    assert response.json()[0]["details"] == "Status changed to closed"
+
+def test_foreign_key_constraints(test_db):
+    # Create a history record with a non-existent project ID
+    response = client.post("/api/history/", json={"entity_type": "project", "entity_id": 9999, "change_type": "create", "user_id": 1, "details": "Invalid project"})
+    assert response.status_code == 422  # Unprocessable Entity
+
+    # Create a history record with a non-existent ticket ID
+    response = client.post("/api/history/", json={"entity_type": "ticket", "entity_id": 9999, "change_type": "create", "user_id": 1, "details": "Invalid ticket"})
+    assert response.status_code == 422  # Unprocessable Entity

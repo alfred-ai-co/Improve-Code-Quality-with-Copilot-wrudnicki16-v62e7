@@ -13,7 +13,7 @@ def create_history(history: HistoryCreate, db: Session = Depends(get_db)):
     return history_crud.create(**history.model_dump())
 
 @router.get("/{entity_id}", response_model=List[HistoryResponse])
-def get_history_by_entity_id(entity_type: str, entity_id: int, offset: int = 0, limit: int = 20, db: Session = Depends(get_db)):
+def get_history_by_entity_id(entity_type: str, entity_id: int, offset: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     history_crud = HistoryCRUD(db)
 
     # Apply this if history retrieval becomes too slow

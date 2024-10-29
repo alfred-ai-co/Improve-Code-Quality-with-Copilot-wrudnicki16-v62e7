@@ -20,7 +20,7 @@ def create_history_entry(mapper, connection, target):
         new_status = target.status
         if old_status == new_status:
             return
-        details = f"Status changed from {old_status} to {new_status}"
+        details = f"Status changed from '{old_status}' to '{new_status}'"
     elif isinstance(target, Ticket):
         entity_type = 'ticket'
         entity_id = target.id
@@ -29,7 +29,7 @@ def create_history_entry(mapper, connection, target):
         new_status = target.status
         if old_status == new_status:
             return
-        details = f"Status changed from {old_status} to {new_status}"
+        details = f"Status changed from '{old_status}' to '{new_status}'"
     else:
         return
 
